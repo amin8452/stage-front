@@ -1,0 +1,33 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="30" cy="30" r="25" fill="url(#gradient1)" stroke="#1e40af" stroke-width="2"/>
+  
+  <!-- MS360 Text -->
+  <text x="70" y="25" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#1e40af">MS</text>
+  <text x="110" y="25" font-family="Arial, sans-serif" font-size="20" font-weight="normal" fill="#0ea5e9">360</text>
+  
+  <!-- Tagline -->
+  <text x="70" y="42" font-family="Arial, sans-serif" font-size="10" fill="#64748b">Solutions Digitales</text>
+  
+  <!-- Icon inside circle -->
+  <g transform="translate(20, 20)">
+    <!-- Digital/Tech icon -->
+    <rect x="5" y="5" width="4" height="4" fill="white" rx="1"/>
+    <rect x="11" y="5" width="4" height="4" fill="white" rx="1"/>
+    <rect x="5" y="11" width="4" height="4" fill="white" rx="1"/>
+    <rect x="11" y="11" width="4" height="4" fill="white" rx="1"/>
+    <!-- Connection lines -->
+    <line x1="7" y1="9" x2="7" y2="11" stroke="white" stroke-width="1"/>
+    <line x1="13" y1="9" x2="13" y2="11" stroke="white" stroke-width="1"/>
+    <line x1="9" y1="7" x2="11" y2="7" stroke="white" stroke-width="1"/>
+    <line x1="9" y1="13" x2="11" y2="13" stroke="white" stroke-width="1"/>
+  </g>
+  
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

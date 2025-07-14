@@ -1,0 +1,87 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#background)"/>
+  
+  <!-- Grid Pattern -->
+  <defs>
+    <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  
+  <!-- Main Content -->
+  <g transform="translate(100, 150)">
+    <!-- Logo Area -->
+    <circle cx="80" cy="80" r="60" fill="url(#logoGradient)" stroke="#22c55e" stroke-width="3"/>
+    
+    <!-- Logo Icon -->
+    <g transform="translate(50, 50)">
+      <rect x="10" y="10" width="15" height="15" fill="white" rx="2"/>
+      <rect x="35" y="10" width="15" height="15" fill="white" rx="2"/>
+      <rect x="10" y="35" width="15" height="15" fill="white" rx="2"/>
+      <rect x="35" y="35" width="15" height="15" fill="white" rx="2"/>
+      <!-- Connection lines -->
+      <line x1="25" y1="17.5" x2="35" y2="17.5" stroke="white" stroke-width="2"/>
+      <line x1="25" y1="42.5" x2="35" y2="42.5" stroke="white" stroke-width="2"/>
+      <line x1="17.5" y1="25" x2="17.5" y2="35" stroke="white" stroke-width="2"/>
+      <line x1="42.5" y1="25" x2="42.5" y2="35" stroke="white" stroke-width="2"/>
+    </g>
+    
+    <!-- Company Name -->
+    <text x="200" y="60" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white">MS360</text>
+    <text x="200" y="100" font-family="Arial, sans-serif" font-size="24" fill="#22c55e">Solutions Digitales</text>
+    
+    <!-- Main Title -->
+    <text x="200" y="180" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="white">Portrait Prédictif IA</text>
+    <text x="200" y="220" font-family="Arial, sans-serif" font-size="24" fill="#94a3b8">Analyse personnalisée & Prédictions 2025-2027</text>
+    
+    <!-- Features -->
+    <g transform="translate(200, 260)">
+      <text x="0" y="30" font-family="Arial, sans-serif" font-size="18" fill="#e2e8f0">✨ Analyse approfondie de votre profil professionnel</text>
+      <text x="0" y="60" font-family="Arial, sans-serif" font-size="18" fill="#e2e8f0">🔮 Prédictions IA pour les 3 prochaines années</text>
+      <text x="0" y="90" font-family="Arial, sans-serif" font-size="18" fill="#e2e8f0">🎯 Recommandations stratégiques personnalisées</text>
+      <text x="0" y="120" font-family="Arial, sans-serif" font-size="18" fill="#e2e8f0">🚀 Plan d'action concret et actionnable</text>
+    </g>
+  </g>
+  
+  <!-- Bottom Info -->
+  <g transform="translate(100, 550)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="16" fill="#64748b">ms360.fr • contact@ms360.fr</text>
+    <text x="0" y="25" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Votre partenaire digital de confiance</text>
+  </g>
+  
+  <!-- Decorative Elements -->
+  <circle cx="1000" cy="150" r="100" fill="url(#accent1)" opacity="0.3"/>
+  <circle cx="1100" cy="400" r="80" fill="url(#accent2)" opacity="0.2"/>
+  <circle cx="950" cy="500" r="60" fill="url(#accent3)" opacity="0.4"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="background" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
+    </linearGradient>
+    
+    <radialGradient id="accent1">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0" />
+    </radialGradient>
+    
+    <radialGradient id="accent2">
+      <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:0" />
+    </radialGradient>
+    
+    <radialGradient id="accent3">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+</svg>

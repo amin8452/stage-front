@@ -1,0 +1,33 @@
+# Production optimized .gitignore
+
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+build/
+
+# Environment variables (CRITICAL SECURITY)
+.env.local
+.env
+.env.production
+.env.development
+*.env
+# Never commit files containing API keys or secrets!
+
+
+# Logs
+*.log
+
+# Editor files
+.vscode/
+.idea/
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+
+# Production builds
+dist/
