@@ -294,8 +294,6 @@ export class EmailService {
       // Retourner le résultat de l'email utilisateur (prioritaire)
       const userResponse = userResult.status === 'fulfilled' ? userResult.value : { success: false, error: 'Échec envoi utilisateur' };
 
-   
-
       return userResponse;
 
     } catch (error) {
