@@ -53,10 +53,7 @@ function validateClientEnvironmentVariables(): void {
   });
 
   if (missingVars.length > 0) {
-    console.warn(
-      `Variables d'environnement publiques manquantes: ${missingVars.join(', ')}\n` +
-      'Certaines fonctionnalités peuvent être limitées'
-    );
+    // Variables d'environnement manquantes - certaines fonctionnalités peuvent être limitées
   }
 }
 
@@ -70,7 +67,7 @@ export function getApiConfig(): ApiConfig {
     // Configuration pour les appels internes (vers nos API routes)
     const baseUrl = typeof window !== 'undefined'
       ? window.location.origin
-      : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      : process.env.NEXT_PUBLIC_SITE_URL || 'https://stage-front-main-amineabdelkafi839-4526s-projects.vercel.app';
 
     return {
       internal: {
@@ -102,7 +99,6 @@ export function getApiConfig(): ApiConfig {
       }
     };
   } catch (error) {
-    console.error('Erreur de configuration API:', error);
     throw error;
   }
 }

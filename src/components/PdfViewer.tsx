@@ -113,30 +113,24 @@ const PdfViewer = ({
     setIsSendingEmail(true);
     try {
       if (pdfBlob && filename) {
-        // Utilise le nouveau système d'email avec PDF moderne
-        console.log('📧 Envoi du PDF moderne par email...');
-
-        const result = await EmailService.sendWelcomeEmail(
+        // Utilise le nouveau système d'email avec PDF en pièce jointe
+        const result = await EmailService.sendEmailWithPdf(
           userEmail,
-          userName
+          userName,
+          pdfBlob,
+          filename
         );
 
         if (result.success) {
-          const methodMessage = result.method === 'mailto'
-            ? 'Votre client email va s\'ouvrir pour envoyer le rapport'
-            : 'Votre rapport PDF moderne a été envoyé';
-
           toast({
-            title: "📧 Email préparé avec succès !",
-            description: `${methodMessage} à ${userEmail}`,
+            title: "📧 Email envoyé avec succès !",
+            description: `Votre rapport PDF a été envoyé en pièce jointe à ${userEmail}`,
           });
         } else {
           throw new Error(result.error);
         }
       } else {
         // Fallback: utilise l'ancien système
-        console.log('📧 Envoi par email (fallback)...');
-
         const result = await EmailService.sendEmail({
           to: userEmail,
           subject: `Votre Portrait Prédictif IA - ${userName}`,
@@ -145,20 +139,15 @@ const PdfViewer = ({
         });
 
         if (result.success) {
-          const methodMessage = result.method === 'mailto'
-            ? 'Votre client email va s\'ouvrir pour envoyer le rapport'
-            : 'Votre rapport a été envoyé';
-
           toast({
-            title: "📧 Email préparé !",
-            description: `${methodMessage} à ${userEmail}`,
+            title: "📧 Email envoyé !",
+            description: `Votre rapport a été envoyé à ${userEmail}`,
           });
         } else {
           throw new Error(result.error);
         }
       }
     } catch (error) {
-      console.error('❌ Erreur lors de l\'envoi de l\'email:', error);
       toast({
         title: "❌ Erreur d'envoi",
         description: "Impossible d'envoyer l'email. Veuillez réessayer.",

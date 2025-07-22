@@ -31,3 +31,5 @@ build/
 
 # Production builds
 dist/
+
+.vercel

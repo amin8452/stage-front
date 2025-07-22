@@ -8,8 +8,11 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Shield, CheckCircle, Zap, Brain, Download, Bot, ArrowLeft, Eye } from "lucide-react";
 import { PdfGenerator } from "@/services/PdfGeneratorOptimized";
-import { EmailService } from "@/services/EmailService";
+import { EmailService, UserInfo } from "@/services/EmailService";
+
 import PdfViewer from "./PdfViewer";
+
+import NotificationBar from "./NotificationBar";
 
 
 const LeadForm = () => {
@@ -35,6 +38,12 @@ const LeadForm = () => {
     filename?: string;
   } | null>(null);
   const [showPdfViewer, setShowPdfViewer] = useState(false);
+
+  // États pour le suivi du processus
+  const [pdfGenerated, setPdfGenerated] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [showNotificationBar, setShowNotificationBar] = useState(false);
+
   const { toast } = useToast();
 
   const totalSteps = 3;
@@ -43,11 +52,15 @@ const LeadForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+    setPdfGenerated(false);
+    setEmailSent(false);
+    setShowNotificationBar(true);
+
     try {
       const result = await PdfGenerator.generateSecurePdf(formData);
 
       if (result.success) {
+        setPdfGenerated(true);
         if (result.downloadUrl && result.pdfContent) {
           setPdfData({
             downloadUrl: result.downloadUrl,
@@ -65,29 +78,54 @@ const LeadForm = () => {
           position: formData.position
         });
 
-        // Envoyer automatiquement l'email de bienvenue
+        // Envoyer automatiquement l'email avec PDF en pièce jointe + notification société
         try {
-          const emailResult = await EmailService.sendWelcomeEmail(
-            formData.email,
-            formData.name
-          );
+          const userInfo: UserInfo = {
+            name: formData.name,
+            email: formData.email,
+            sector: formData.sector,
+            position: formData.position,
+            ambitions: formData.ambitions,
+            timestamp: new Date().toISOString()
+          };
+
+          // Si on a un PDF généré, l'envoyer en pièce jointe
+          let emailResult;
+          if (result.pdfBlob && result.filename) {
+            emailResult = await EmailService.sendEmailWithPdf(
+              formData.email,
+              formData.name,
+              result.pdfBlob,
+              result.filename,
+              userInfo
+            );
+          } else {
+            // Fallback vers l'email de bienvenue standard
+            emailResult = await EmailService.sendWelcomeEmail(
+              formData.email,
+              formData.name,
+              userInfo
+            );
+          }
 
           if (emailResult.success) {
+            setEmailSent(true);
             toast({
-              title: "🤖 Portrait Prédictif IA Généré!",
-              description: `${result.message} Un email de confirmation a été envoyé à ${formData.email}`,
+              title: "🎉 Génération Réussie !",
+              description: `✨ ${formData.name}, votre Portrait Prédictif IA a été généré avec succès ! Un email de confirmation a été envoyé à ${formData.email}.`,
             });
           } else {
+            setEmailSent(false);
             toast({
-              title: "🤖 Portrait Prédictif IA Généré!",
-              description: result.message,
+              title: "📄 PDF Généré !",
+              description: `✨ ${formData.name}, votre Portrait Prédictif IA a été généré avec succès ! (Email non envoyé: ${emailResult.error})`,
             });
           }
         } catch (emailError) {
-          // Si l'email échoue, on affiche quand même le succès de génération
+          setEmailSent(false);
           toast({
-            title: "🤖 Portrait Prédictif IA Généré!",
-            description: result.message,
+            title: "📄 PDF Généré !",
+            description: `✨ ${formData.name}, votre Portrait Prédictif IA a été généré avec succès ! (Email non envoyé)`,
           });
         }
 
@@ -101,16 +139,19 @@ const LeadForm = () => {
         });
         setCurrentStep(1);
       } else {
+        // En cas d'erreur, on cache la notification bar
+        setShowNotificationBar(false);
         toast({
-          title: "❌ Erreur de génération IA",
-          description: result.error || "Une erreur est survenue lors de la génération du PDF avec l'IA.",
+          title: "❌ Échec de Génération",
+          description: `💥 Impossible de générer le PDF pour ${formData.name}. ${result.error || "Erreur inconnue de l'IA"}. Veuillez réessayer.`,
           variant: "destructive",
         });
       }
     } catch (error) {
+      setShowNotificationBar(false);
       toast({
-        title: "❌ Erreur technique",
-        description: "Une erreur technique est survenue avec l'IA . Veuillez réessayer.",
+        title: "❌ Erreur Technique Critique",
+        description: `🔧 Problème technique lors de la génération du Portrait Prédictif pour ${formData.name}. Vérifiez votre connexion et réessayez.`,
         variant: "destructive",
       });
     } finally {
@@ -295,6 +336,8 @@ const LeadForm = () => {
             </div>
           </div>
 
+
+
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Step 1: Personal Information */}
             {currentStep === 1 && (
@@ -316,7 +359,7 @@ const LeadForm = () => {
                       className="h-14 text-lg bg-white/5 backdrop-blur-sm border border-white/20 text-white placeholder-slate-400 focus:border-cyan-400 focus:bg-white/10 rounded-xl transition-all duration-300"
                     />
                   </div>
-                  
+
                   <div className="space-y-3">
                     <Label htmlFor="email" className="text-lg font-semibold text-white">Email professionnel *</Label>
                     <Input
@@ -534,6 +577,16 @@ const LeadForm = () => {
         />
       )}
 
+      {/* Barre de notification en bas */}
+      <NotificationBar
+        isVisible={showNotificationBar}
+        pdfGenerated={pdfGenerated}
+        emailSent={emailSent}
+        isProcessing={isSubmitting}
+        userName={userInfo.name || formData.name}
+        userEmail={userInfo.email || formData.email}
+        onClose={() => setShowNotificationBar(false)}
+      />
 
     </section>
   );

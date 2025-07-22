@@ -1,37 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Vérification des API routes sécurisées
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    // Exclure les routes publiques si nécessaire
-    const publicRoutes = ['/api/health', '/api/status'];
-    
-    if (!publicRoutes.includes(request.nextUrl.pathname)) {
-      // Vérification de la clé API pour les routes protégées
-      const authHeader = request.headers.get('authorization');
-      const serverKey = process.env.API_SECRET_KEY;
-      const publicKey = process.env.NEXT_PUBLIC_API_KEY;
+  // Middleware simplifié pour accès public
+  // Pas de vérification d'authentification pour permettre l'accès public
 
-      if (!authHeader) {
-        return NextResponse.json(
-          { success: false, error: 'Non autorisé - En-tête manquant' },
-          { status: 401 }
-        );
-      }
-
-      const apiKey = authHeader.replace('Bearer ', '');
-
-      // Accepter soit la clé serveur soit la clé publique
-      if (apiKey !== serverKey && apiKey !== publicKey) {
-        return NextResponse.json(
-          { success: false, error: 'Non autorisé - Clé invalide' },
-          { status: 401 }
-        );
-      }
-    }
-  }
-
-  // Headers de sécurité pour toutes les réponses
+  // Headers de sécurité et performance pour toutes les réponses
   const response = NextResponse.next();
 
   // Headers de sécurité
@@ -40,6 +13,21 @@ export function middleware(request: NextRequest) {
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
+  // Headers de performance pour API
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  }
+
+  // Cache pour les assets statiques
+  if (request.nextUrl.pathname.startsWith('/_next/static/') ||
+      request.nextUrl.pathname.startsWith('/images/') ||
+      request.nextUrl.pathname.endsWith('.ico')) {
+    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+
   // CSP (Content Security Policy) - ajustez selon vos besoins
   const csp = [
     "default-src 'self'",
@@ -47,7 +35,7 @@ export function middleware(request: NextRequest) {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https:",
-    "connect-src 'self' https://api.emailjs.com https://openrouter.ai",
+    "connect-src 'self' https://api.emailjs.com https://openrouter.ai https://stage-front-main-amineabdelkafi839-4526s-projects.vercel.app",
   ].join('; ');
 
   response.headers.set('Content-Security-Policy', csp);

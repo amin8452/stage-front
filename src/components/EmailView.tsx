@@ -46,10 +46,7 @@ L'équipe AI Portrait Pro`
 
   // Mise à jour automatique quand les props changent
   useEffect(() => {
-    console.log('📧 EmailView - Props reçues:', { defaultEmail, defaultName });
-
     if (defaultEmail || defaultName) {
-      console.log('📧 EmailView - Mise à jour des données');
       setFormData(prev => ({
         ...prev,
         email: defaultEmail,
@@ -73,8 +70,6 @@ Nous vous souhaitons beaucoup de succès dans la réalisation de vos ambitions p
 Cordialement,
 L'équipe AI Portrait Pro`
       }));
-    } else {
-      console.log('⚠️ EmailView - Pas de données par défaut reçues');
     }
   }, [defaultEmail, defaultName, isOpen]);
   
@@ -128,7 +123,6 @@ L'équipe AI Portrait Pro`
         throw new Error(result.error || 'Erreur lors de l\'envoi');
       }
     } catch (error) {
-      console.error('❌ Erreur lors de l\'envoi:', error);
       toast({
         title: "❌ Erreur d'envoi",
         description: "Impossible d'envoyer l'email. Veuillez vérifier votre connexion et réessayer.",

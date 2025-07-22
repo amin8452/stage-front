@@ -66,13 +66,13 @@ export default async function handler(
     });
   }
 
-  // Validation de la clé API interne
-  if (!validateInternalApiKey(req)) {
-    return res.status(401).json({
-      success: false,
-      error: 'Non autorisé'
-    });
-  }
+  // API publique - pas de validation de clé requise pour l'accès public
+  // if (!validateInternalApiKey(req)) {
+  //   return res.status(401).json({
+  //     success: false,
+  //     error: 'Non autorisé'
+  //   });
+  // }
 
   // Validation des données
   if (!validateFormData(req.body)) {
@@ -133,14 +133,18 @@ Vision inspirante et encourageante pour ${formData.name}.
 
 Utilise un ton professionnel mais accessible, avec des données concrètes et des conseils actionnables. Minimum 800 mots.`;
 
-    // Appel à l'API OpenRouter
+    // Appel à l'API OpenRouter avec timeout optimisé
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
+
     const response = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
+      signal: controller.signal,
       headers: {
         'Authorization': `Bearer ${openRouterApiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-        'X-Title': 'AI Portrait Pro'
+        'HTTP-Referer': process.env.NEXT_PUBLIC_SITE_URL || 'https://stage-front-main-amineabdelkafi839-4526s-projects.vercel.app',
+        'X-Title': 'AI Portrait Pro - MS360'
       },
       body: JSON.stringify({
         model: model,
@@ -154,14 +158,18 @@ Utilise un ton professionnel mais accessible, avec des données concrètes et de
             content: prompt
           }
         ],
-        max_tokens: 2000,
-        temperature: 0.7,
-        top_p: 0.9
+        max_tokens: 1500,
+        temperature: 0.6,
+        top_p: 0.8,
+        stream: false
       })
     });
 
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
-      throw new Error(`Erreur API: ${response.status}`);
+      const errorText = await response.text().catch(() => 'Erreur inconnue');
+      throw new Error(`Erreur API OpenRouter: ${response.status} - ${errorText}`);
     }
 
     const data: DeepseekResponse = await response.json();
@@ -171,8 +179,11 @@ Utilise un ton professionnel mais accessible, avec des données concrètes et de
     }
 
     const content = data.choices[0].message.content;
-    
-    // Contenu généré avec succès
+
+    // Validation du contenu généré
+    if (!content || content.trim().length === 0) {
+      throw new Error('L\'API IA a retourné un contenu vide. Veuillez réessayer.');
+    }
 
     return res.status(200).json({
       success: true,
@@ -180,9 +191,29 @@ Utilise un ton professionnel mais accessible, avec des données concrètes et de
     });
 
   } catch (error) {
+
+    // Gestion spécifique des timeouts
+    if (error instanceof Error && error.name === 'AbortError') {
+      return res.status(408).json({
+        success: false,
+        error: 'Timeout: La génération IA a pris trop de temps. Veuillez réessayer.'
+      });
+    }
+
     return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Erreur interne du serveur'
     });
   }
 }
+
+// Configuration pour optimiser les performances Vercel
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '1mb',
+    },
+    responseLimit: '8mb',
+  },
+  maxDuration: 60, // 60 secondes max pour Vercel Pro
+};

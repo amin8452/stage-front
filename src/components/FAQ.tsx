@@ -153,7 +153,7 @@ const FAQ = () => {
             Notre équipe d'experts est disponible pour vous accompagner
           </p>
           <div className="flex items-center justify-center space-x-6 text-sm text-slate-400">
-            <span>📧 support@aiportrait.com</span>
+            <span>📧contact@ms360.fr</span>
             <span>🕒 Réponse en 2h max</span>
             <span>💬 Chat en direct</span>
           </div>

@@ -25,7 +25,7 @@ const VideoSection = () => {
         setIsPlaying(true);
       }
     } catch (err) {
-      console.error("Erreur lecture vidéo:", err);
+      // Erreur de lecture vidéo ignorée
     }
   };
 
@@ -49,7 +49,7 @@ const VideoSection = () => {
         await video.requestFullscreen?.();
       }
     } catch (err) {
-      console.error("Erreur plein écran:", err);
+      // Erreur plein écran ignorée
     }
   };
 
