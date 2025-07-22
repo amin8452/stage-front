@@ -239,87 +239,98 @@ export class PDFKitGenerator {
     
     yPos += 20;
     
-    // Section Analyse IA
+    // Section Contenu IA Complet
     doc.fillColor('#2980b9')
        .fontSize(16)
        .font('Helvetica-Bold')
-       .text('2. ANALYSE PERSONNALISÉE', 50, yPos);
+       .text('2. ANALYSE PERSONNALISÉE IA', 50, yPos);
     yPos += 25;
+
+    // Traitement amélioré du contenu IA
+    this.renderAIContent(doc, aiContent, yPos, pageWidth);
     
-    // Contenu IA formaté
-    doc.fillColor('#34495e')
-       .fontSize(11)
-       .font('Helvetica');
-    
-    // Diviser le contenu en paragraphes
-    const paragraphs = aiContent.split('\n\n');
-    
-    paragraphs.forEach(paragraph => {
-      if (paragraph.trim()) {
-        // Vérifier si on a assez de place sur la page
-        if (yPos > doc.page.height - 100) {
-          doc.addPage();
-          yPos = 80;
-        }
-        
-        // Vérifier si c'est un titre
-        if (paragraph.match(/^[\d\*\-#]/)) {
-          doc.font('Helvetica-Bold')
-             .fontSize(12);
-        } else {
-          doc.font('Helvetica')
-             .fontSize(11);
-        }
-        
-        const textHeight = doc.heightOfString(paragraph.trim(), {
-          width: pageWidth - 100
-        });
-        
-        doc.text(paragraph.trim(), 50, yPos, {
-          width: pageWidth - 100,
-          align: 'justify'
-        });
-        
-        yPos += textHeight + 15;
-      }
-    });
-    
-    // Section Recommandations
-    if (yPos > doc.page.height - 200) {
-      doc.addPage();
-      yPos = 80;
-    }
-    
-    yPos += 30;
-    doc.fillColor('#2980b9')
-       .fontSize(16)
-       .font('Helvetica-Bold')
-       .text('3. RECOMMANDATIONS', 50, yPos);
-    yPos += 25;
-    
-    doc.fillColor('#34495e')
-       .fontSize(11)
-       .font('Helvetica');
-    
-    const recommendations = [
-      '• Continuez à développer vos compétences dans votre secteur',
-      '• Explorez les opportunités de formation et de certification',
-      '• Développez votre réseau professionnel',
-      '• Restez informé des tendances de votre industrie',
-      '• Considérez des projets qui alignent avec vos ambitions'
-    ];
-    
-    recommendations.forEach(rec => {
-      doc.text(rec, 50, yPos, {
-        width: pageWidth - 100
-      });
-      yPos += 20;
-    });
+    // Note: Les recommandations sont maintenant incluses dans le contenu AI généré
+    // Plus besoin de recommandations statiques
     
     // Pied de page sur toutes les pages
     this.addFooterToAllPages(doc);
   }
   
+  /**
+   * Traite et affiche le contenu IA de manière structurée
+   */
+  private static renderAIContent(doc: InstanceType<typeof PDFDocument>, aiContent: string, startY: number, pageWidth: number): number {
+    let yPos = startY;
+
+    // Nettoyer et diviser le contenu
+    const lines = aiContent.split('\n').filter(line => line.trim());
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+
+      // Vérifier si on a assez de place sur la page
+      if (yPos > doc.page.height - 100) {
+        doc.addPage();
+        yPos = 80;
+      }
+
+      // Détection des différents types de contenu
+      if (trimmedLine.startsWith('# ')) {
+        // Titre principal (H1)
+        doc.fillColor('#2980b9')
+           .fontSize(18)
+           .font('Helvetica-Bold');
+        const title = trimmedLine.replace('# ', '');
+        doc.text(title, 50, yPos, { width: pageWidth - 100 });
+        yPos += 30;
+
+      } else if (trimmedLine.startsWith('## ')) {
+        // Sous-titre (H2)
+        doc.fillColor('#2980b9')
+           .fontSize(14)
+           .font('Helvetica-Bold');
+        const subtitle = trimmedLine.replace('## ', '');
+        doc.text(subtitle, 50, yPos, { width: pageWidth - 100 });
+        yPos += 25;
+
+      } else if (trimmedLine.startsWith('**') && trimmedLine.endsWith('**')) {
+        // Texte en gras
+        doc.fillColor('#34495e')
+           .fontSize(11)
+           .font('Helvetica-Bold');
+        const boldText = trimmedLine.replace(/\*\*/g, '');
+        const textHeight = doc.heightOfString(boldText, { width: pageWidth - 100 });
+        doc.text(boldText, 50, yPos, { width: pageWidth - 100 });
+        yPos += textHeight + 10;
+
+      } else if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('• ')) {
+        // Liste à puces
+        doc.fillColor('#34495e')
+           .fontSize(11)
+           .font('Helvetica');
+        const listItem = trimmedLine.replace(/^[-•]\s*/, '• ');
+        const textHeight = doc.heightOfString(listItem, { width: pageWidth - 120 });
+        doc.text(listItem, 70, yPos, { width: pageWidth - 120 });
+        yPos += textHeight + 8;
+
+      } else if (trimmedLine.length > 0) {
+        // Paragraphe normal
+        doc.fillColor('#34495e')
+           .fontSize(11)
+           .font('Helvetica');
+        const textHeight = doc.heightOfString(trimmedLine, { width: pageWidth - 100 });
+        doc.text(trimmedLine, 50, yPos, {
+          width: pageWidth - 100,
+          align: 'justify'
+        });
+        yPos += textHeight + 12;
+      }
+    }
+
+    return yPos;
+  }
+
   /**
    * Ajoute un pied de page (simplifié pour PDFKit)
    */
