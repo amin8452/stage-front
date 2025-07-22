@@ -294,16 +294,7 @@ export class EmailService {
       // Retourner le résultat de l'email utilisateur (prioritaire)
       const userResponse = userResult.status === 'fulfilled' ? userResult.value : { success: false, error: 'Échec envoi utilisateur' };
 
-      // Gérer l'échec de l'email société avec fallback
-      if (companyResult.status === 'rejected') {
-        console.error('❌ Erreur envoi notification société:', companyResult.reason);
-        // Essayer un envoi de fallback simplifié
-        this.sendSimpleCompanyNotification(name, email).catch((error) => {
-          console.error('❌ Échec total notification société:', error);
-        });
-      } else {
-        console.log('✅ Notification société envoyée avec succès');
-      }
+   
 
       return userResponse;
 
