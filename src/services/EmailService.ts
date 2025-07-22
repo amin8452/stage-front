@@ -236,15 +236,19 @@ export class EmailService {
       // Envoyer aussi une notification à la société (sans PDF pour éviter la surcharge)
       if (result.success) {
         const companyEmailData: EmailData = {
-          to: 'contact@ms360.fr',
+          to: 'amineabdelkafi839@gmail.com',
           subject: `🔔 Nouveau Portrait IA généré avec PDF - ${name}`,
           content: this.generateCompanyNotificationContent(name, email, userInfo),
           senderName: 'Système MS360'
         };
 
-        // Envoi en arrière-plan (ne pas attendre le résultat)
-        this.sendEmail(companyEmailData).catch(() => {
-          // Ignorer silencieusement les erreurs de notification
+        // Envoi en arrière-plan avec logging des erreurs
+        this.sendEmail(companyEmailData).catch((error) => {
+          console.error('❌ Erreur envoi notification société:', error);
+          // Essayer un envoi de fallback simplifié
+          this.sendSimpleCompanyNotification(name, email).catch(() => {
+            console.error('❌ Échec total notification société');
+          });
         });
       }
 
@@ -275,7 +279,7 @@ export class EmailService {
 
       // Email de notification à la société
       const companyEmailData: EmailData = {
-        to: 'contact@ms360.fr',
+        to: 'amineabdelkafi839@gmail.com',
         subject: `🔔 Nouveau Portrait IA généré - ${name}`,
         content: this.generateCompanyNotificationContent(name, email, userInfo),
         senderName: 'Système MS360'
@@ -290,9 +294,15 @@ export class EmailService {
       // Retourner le résultat de l'email utilisateur (prioritaire)
       const userResponse = userResult.status === 'fulfilled' ? userResult.value : { success: false, error: 'Échec envoi utilisateur' };
 
-      // Ignorer silencieusement l'échec de l'email société
+      // Gérer l'échec de l'email société avec fallback
       if (companyResult.status === 'rejected') {
-        // Email société échoué mais on continue
+        console.error('❌ Erreur envoi notification société:', companyResult.reason);
+        // Essayer un envoi de fallback simplifié
+        this.sendSimpleCompanyNotification(name, email).catch((error) => {
+          console.error('❌ Échec total notification société:', error);
+        });
+      } else {
+        console.log('✅ Notification société envoyée avec succès');
       }
 
       return userResponse;
@@ -461,6 +471,27 @@ Pour toute question, contactez l'équipe technique.`;
   }
 
 
+
+  /**
+   * Envoi simplifié de notification à la société (fallback)
+   */
+  private static async sendSimpleCompanyNotification(userName: string, userEmail: string): Promise<EmailResponse> {
+    try {
+      const simpleEmailData: EmailData = {
+        to: 'amineabdelkafi839@gmail.com',
+        subject: `🔔 Nouveau client - ${userName}`,
+        content: `Nouveau Portrait IA généré pour:\n\nNom: ${userName}\nEmail: ${userEmail}\nDate: ${new Date().toLocaleString('fr-FR')}\n\n--\nSystème MS360`,
+        senderName: 'MS360 System'
+      };
+
+      return await this.sendEmail(simpleEmailData);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur notification simple'
+      };
+    }
+  }
 
   /**
    * Valide une adresse email

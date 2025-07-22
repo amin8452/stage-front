@@ -44,7 +44,7 @@ export const MS360_CONFIG: CompanyInfo = {
   fullName: 'MS360 - Solutions Digitales',
   website: 'https://ms360.fr',
   domain: 'ms360.fr',
-  email: 'contact@ms360.fr',
+  email: 'amineabdelkafi839@gmail.com',
   supportEmail: 'support@ms360.fr',
   logo: '/ms360.png',
   favicon: '/favicon.ico',
