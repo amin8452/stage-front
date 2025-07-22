@@ -70,7 +70,14 @@ export default async function handler(
     // Configuration sécurisée côté serveur
     const openRouterApiKey = process.env.OPENROUTER_API_KEY;
     const baseUrl = process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1';
-    const model = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-r1-0528:free';
+    const model = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-r1-distill-llama-70b';
+
+    console.log('🔧 Configuration API:', {
+      hasApiKey: !!openRouterApiKey,
+      baseUrl,
+      model,
+      formData: { name: formData.name, sector: formData.sector }
+    });
 
     if (!openRouterApiKey) {
       throw new Error('Clé API OpenRouter non configurée');
@@ -149,13 +156,26 @@ Utilise un ton professionnel mais accessible, avec des données concrètes et de
 
     clearTimeout(timeoutId);
 
+    console.log('📡 Réponse API:', {
+      status: response.status,
+      ok: response.ok,
+      headers: Object.fromEntries(response.headers.entries())
+    });
+
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Erreur inconnue');
+      console.error('❌ Erreur API OpenRouter:', response.status, errorText);
       throw new Error(`Erreur API OpenRouter: ${response.status} - ${errorText}`);
     }
 
     const data: DeepseekResponse = await response.json();
-    
+
+    console.log('🤖 Données reçues:', {
+      hasChoices: !!data.choices,
+      choicesLength: data.choices?.length || 0,
+      contentLength: data.choices?.[0]?.message?.content?.length || 0
+    });
+
     if (!data.choices || data.choices.length === 0) {
       throw new Error('Réponse API invalide');
     }
@@ -167,15 +187,19 @@ Utilise un ton professionnel mais accessible, avec des données concrètes et de
       throw new Error('L\'API IA a retourné un contenu vide. Veuillez réessayer.');
     }
 
+    console.log('✅ Contenu IA généré avec succès:', content.substring(0, 200) + '...');
+
     return res.status(200).json({
       success: true,
       content: content
     });
 
   } catch (error) {
+    console.error('🚨 Erreur lors de la génération IA:', error);
 
     // Gestion spécifique des timeouts
     if (error instanceof Error && error.name === 'AbortError') {
+      console.log('⏰ Timeout détecté');
       return res.status(408).json({
         success: false,
         error: 'Timeout: La génération IA a pris trop de temps. Veuillez réessayer.'
@@ -183,6 +207,7 @@ Utilise un ton professionnel mais accessible, avec des données concrètes et de
     }
 
     // Contenu de fallback personnalisé
+    console.log('🔄 Utilisation du contenu fallback');
     const fallbackContent = generateFallbackContent(formData);
 
     return res.status(200).json({
