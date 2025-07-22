@@ -33,3 +33,5 @@ build/
 dist/
 
 .vercel
+
+/generated/prisma

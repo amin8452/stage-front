@@ -1,4 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { UserService } from '../../../src/services/UserService';
+import { PdfService } from '../../../src/services/PdfService';
 
 interface FormData {
   name: string;
@@ -22,19 +24,7 @@ interface ApiResponse {
   error?: string;
 }
 
-// Validation de la clé API interne
-function validateInternalApiKey(req: NextApiRequest): boolean {
-  const apiKey = req.headers.authorization?.replace('Bearer ', '');
-  const serverKey = process.env.API_SECRET_KEY || 'development-key';
-  const publicKey = process.env.NEXT_PUBLIC_API_KEY || 'public-dev-key';
 
-  // Accepter soit la clé serveur soit la clé publique
-  if (!apiKey || (apiKey !== serverKey && apiKey !== publicKey)) {
-    return false;
-  }
-
-  return true;
-}
 
 // Validation des données
 function validateRequest(data: any): data is PdfGenerationRequest {
@@ -82,34 +72,64 @@ export default async function handler(
   const { formData, aiContent }: PdfGenerationRequest = req.body;
 
   try {
-    // Import dynamique pour éviter les problèmes SSR
-    const { PdfGenerator } = await import('../../../src/services/PdfGeneratorOptimized');
+    // 1. Créer ou mettre à jour l'utilisateur dans la base de données
+    const user = await UserService.createUser({
+      name: formData.name,
+      email: formData.email,
+      sector: formData.sector,
+      position: formData.position,
+      ambitions: formData.ambitions
+    });
+
+    // 2. Import dynamique pour éviter les problèmes SSR
+    const { PDFKitGenerator } = await import('../../../src/services/PDFKitGenerator');
 
     // Validation du contenu IA
     if (!aiContent || aiContent.trim().length === 0) {
       throw new Error('Contenu IA manquant ou vide');
     }
 
-    // Génération du PDF avec gestion d'erreur améliorée
-    const pdfResult = await PdfGenerator.generateModernPdf(aiContent, formData);
+    // 3. Génération du PDF professionnel avec PDFKit
+    const pdfResult = await PDFKitGenerator.generateProfessionalPdf(aiContent, formData);
 
-    if (!pdfResult || !pdfResult.pdfBlob) {
-      throw new Error('Échec de génération du PDF - Blob manquant');
+    if (!pdfResult || !pdfResult.pdfBuffer) {
+      throw new Error('Échec de génération du PDF - Buffer manquant');
     }
 
     // Vérification de la taille du PDF
-    if (pdfResult.pdfBlob.size === 0) {
+    if (pdfResult.pdfBuffer.length === 0) {
       throw new Error('PDF généré est vide');
     }
 
-    // Génération du nom de fichier sécurisé
-    const safeName = formData.name.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-').substring(0, 20);
-    const filename = `Portrait-Predictif-${safeName}-${Date.now()}.pdf`;
+    // 4. Utiliser le nom de fichier généré par PDFKit
+    const filename = pdfResult.filename!;
+
+    // 5. Convertir le PDF buffer en base64 pour le téléchargement
+    const pdfBase64 = pdfResult.pdfBuffer!.toString('base64');
+    const downloadUrl = `data:application/pdf;base64,${pdfBase64}`;
+
+    // 6. Sauvegarder les informations du PDF dans la base de données
+    const savedPdf = await PdfService.createPdf({
+      filename: filename,
+      originalName: `Portrait Prédictif - ${formData.name}`,
+      fileSize: pdfResult.pdfBuffer!.length,
+      content: aiContent,
+      downloadUrl: downloadUrl,
+      userId: user.id,
+      metadata: {
+        generatedAt: new Date().toISOString(),
+        userAgent: req.headers['user-agent'],
+        ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        formData: formData
+      }
+    });
 
     return res.status(200).json({
       success: true,
-      downloadUrl: pdfResult.downloadUrl,
+      downloadUrl: downloadUrl,
       filename: filename,
+      pdfId: savedPdf.id,
+      userId: user.id,
       message: `⚡ ${formData.name}, votre Portrait Prédictif a été généré avec succès ! Rapport personnalisé pour ${formData.sector} disponible.`
     });
 
@@ -130,9 +150,23 @@ export default async function handler(
       }
     }
 
+    // En cas d'erreur, essayer quand même de sauvegarder l'utilisateur
+    try {
+      await UserService.createUser({
+        name: formData.name,
+        email: formData.email,
+        sector: formData.sector,
+        position: formData.position,
+        ambitions: formData.ambitions
+      });
+    } catch (userError) {
+      // Erreur silencieuse pour la sauvegarde utilisateur
+    }
+
     return res.status(500).json({
       success: false,
-      error: errorMessage
+      error: errorMessage,
+      message: `❌ Désolé ${formData.name}, une erreur est survenue lors de la génération de votre Portrait Prédictif. Veuillez réessayer.`
     });
   }
 }

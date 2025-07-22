@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modèle User pour stocker les informations des utilisateurs
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  sector    String?
+  position  String?
+  ambitions String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  pdfs      Pdf[]
+
+  @@map("users")
+}
+
+// Modèle PDF pour stocker les informations des PDFs générés
+model Pdf {
+  id          String   @id @default(cuid())
+  filename    String
+  originalName String?
+  fileSize    Int?
+  mimeType    String   @default("application/pdf")
+  content     String? // Contenu IA utilisé pour générer le PDF
+  downloadUrl String?
+  status      PdfStatus @default(GENERATED)
+  metadata    Json?    // Métadonnées additionnelles
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+
+  @@map("pdfs")
+}
+
+// Modèle Admin pour l'authentification des administrateurs
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  password  String   // Hash du mot de passe
+  role      AdminRole @default(ADMIN)
+  isActive  Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+// Énumérations
+enum PdfStatus {
+  GENERATING
+  GENERATED
+  FAILED
+  DELETED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  VIEWER
+}

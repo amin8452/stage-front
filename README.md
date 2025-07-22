@@ -51,6 +51,8 @@ MS360 AI Portrait Pro est une application web innovante qui génère des **Portr
 - **OpenRouter API** - Intelligence artificielle
 - **EmailJS** - Service d'email
 - **jsPDF** - Génération PDF
+- **Neon PostgreSQL** - Base de données cloud
+- **Prisma ORM** - Gestion de base de données
 
 ### **Déploiement & Performance**
 - **Vercel** - Hébergement et déploiement
@@ -74,6 +76,26 @@ Rendez-vous sur : **https://stage-front-main-amineabdelkafi839-4526s-projects.ve
 - Cliquez sur **"Générer mon Portrait IA"**
 - Attendez la génération (20-45 secondes)
 - Consultez le rapport généré
+
+## 🔧 **Interface d'Administration**
+
+### **Accès Admin**
+- **URL** : `/admin/login`
+- **Identifiants par défaut** :
+  - Username: `admin`
+  - Password: `admin123`
+
+### **Fonctionnalités Admin**
+- **📊 Dashboard** : Statistiques en temps réel
+- **👥 Gestion Utilisateurs** : Liste, recherche, détails
+- **📄 Gestion PDFs** : Visualisation, téléchargement, suppression
+- **🔍 Recherche avancée** : Par nom, email, secteur
+- **📈 Statistiques** : Croissance, secteurs populaires
+
+### **Base de Données**
+- **Stockage automatique** des utilisateurs et PDFs
+- **Neon PostgreSQL** pour la persistance
+- **Relations complètes** entre utilisateurs et leurs PDFs
 
 ### **4. Téléchargement & Email**
 - **Téléchargez le PDF** directement

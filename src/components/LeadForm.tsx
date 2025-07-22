@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Shield, CheckCircle, Zap, Brain, Download, Bot, ArrowLeft, Eye } from "lucide-react";
-import { PdfGenerator } from "@/services/PdfGeneratorOptimized";
+
 import { EmailService, UserInfo } from "@/services/EmailService";
 
 import PdfViewer from "./PdfViewer";
@@ -57,16 +57,45 @@ const LeadForm = () => {
     setShowNotificationBar(true);
 
     try {
-      const result = await PdfGenerator.generateSecurePdf(formData);
+      // 1. Générer le contenu IA d'abord
+      const aiResponse = await fetch('/api/ai/generate-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-      if (result.success) {
+      const aiData = await aiResponse.json();
+
+      if (!aiData.success) {
+        throw new Error(aiData.error || 'Erreur lors de la génération du contenu IA');
+      }
+
+      // 2. Générer le PDF avec sauvegarde en base de données
+      const pdfResponse = await fetch('/api/pdf/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formData: formData,
+          aiContent: aiData.content
+        }),
+      });
+
+      const pdfResult = await pdfResponse.json();
+
+      if (pdfResult.success) {
         setPdfGenerated(true);
-        if (result.downloadUrl && result.pdfContent) {
+        if (pdfResult.pdfId) {
+          // Utiliser l'endpoint de téléchargement au lieu de l'URL base64
+          const downloadUrl = `/api/pdf/download/${pdfResult.pdfId}`;
           setPdfData({
-            downloadUrl: result.downloadUrl,
-            pdfContent: result.pdfContent,
-            pdfBlob: result.pdfBlob,
-            filename: result.filename
+            downloadUrl: downloadUrl,
+            pdfContent: aiData.content, // Utiliser le contenu IA généré
+            pdfBlob: null, // Pas de blob côté client maintenant
+            filename: pdfResult.filename
           });
         }
 
@@ -89,24 +118,13 @@ const LeadForm = () => {
             timestamp: new Date().toISOString()
           };
 
-          // Si on a un PDF généré, l'envoyer en pièce jointe
-          let emailResult;
-          if (result.pdfBlob && result.filename) {
-            emailResult = await EmailService.sendEmailWithPdf(
-              formData.email,
-              formData.name,
-              result.pdfBlob,
-              result.filename,
-              userInfo
-            );
-          } else {
-            // Fallback vers l'email de bienvenue standard
-            emailResult = await EmailService.sendWelcomeEmail(
-              formData.email,
-              formData.name,
-              userInfo
-            );
-          }
+          // Pour l'instant, envoyer un email de bienvenue standard
+          // Le PDF est maintenant géré côté serveur
+          const emailResult = await EmailService.sendWelcomeEmail(
+            formData.email,
+            formData.name,
+            userInfo
+          );
 
           if (emailResult.success) {
             setEmailSent(true);
@@ -143,7 +161,7 @@ const LeadForm = () => {
         setShowNotificationBar(false);
         toast({
           title: "❌ Échec de Génération",
-          description: `💥 Impossible de générer le PDF pour ${formData.name}. ${result.error || "Erreur inconnue de l'IA"}. Veuillez réessayer.`,
+          description: `💥 Impossible de générer le PDF pour ${formData.name}. ${pdfResult.error || "Erreur inconnue"}. Veuillez réessayer.`,
           variant: "destructive",
         });
       }
@@ -229,27 +247,38 @@ const LeadForm = () => {
         throw new Error('Aucun contenu disponible');
       }
 
-      const { PdfGenerator } = await import('@/services/PdfGeneratorOptimized');
-
-      // Utiliser la méthode de génération fallback du service unifié
-      const fallbackResult = await PdfGenerator.generateFallbackPdf(
-        pdfData.pdfContent,
-        formData.name || 'Demo'
-      );
-
-      const link = document.createElement('a');
-      link.href = fallbackResult.downloadUrl;
-      link.download = fallbackResult.filename;
-      link.style.display = 'none';
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      toast({
-        title: "📥 PDF Généré !",
-        description: "Votre rapport PDF de fallback a été téléchargé.",
+      // Utiliser l'API pour générer le PDF
+      const response = await fetch('/api/pdf/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la génération du PDF');
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.downloadUrl) {
+        const link = document.createElement('a');
+        link.href = result.downloadUrl;
+        link.download = result.filename || 'portrait-predictif.pdf';
+        link.style.display = 'none';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast({
+          title: "📥 PDF Généré !",
+          description: "Votre rapport PDF a été téléchargé.",
+        });
+      } else {
+        throw new Error(result.error || 'Erreur de génération');
+      }
     } catch (error) {
       toast({
         title: "❌ Erreur",

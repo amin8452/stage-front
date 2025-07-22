@@ -1,33 +1,35 @@
-import { GetStaticProps } from 'next';
-import Head from 'next/head';
-import App from '../src/App';
 
-interface HomeProps {
-  siteUrl: string;
-}
+import Header from "@/components/Header";
+import Hero from "@/components/Hero";
+import AidaMarketingHook from "@/components/AidaMarketingHook";
+import KeyFeatures from "@/components/KeyFeatures";
+import VideoSection from "@/components/VideoSection";
+import Testimonials from "@/components/Testimonials";
+import HowItWorks from "@/components/HowItWorks";
+import LeadForm from "@/components/LeadForm";
+import FAQ from "@/components/FAQ";
+import Footer from "@/components/Footer";
 
-export default function Home({ siteUrl }: HomeProps) {
+
+const Index = () => {
   return (
-    <>
-      <Head>
-        <title>AI Portrait Pro - Portraits Prédictifs IA</title>
-        <meta name="description" content="Générez votre portrait prédictif personnalisé avec l'intelligence artificielle" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta property="og:title" content="AI Portrait Pro - Portraits Prédictifs IA" />
-        <meta property="og:description" content="Générez votre portrait prédictif personnalisé avec l'intelligence artificielle" />
-        <meta property="og:url" content={siteUrl} />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href={siteUrl} />
-      </Head>
-      <App />
-    </>
-  );
-}
+    <div className="min-h-screen bg-black">
+      <Header />
+      <div className="pt-16"> 
+        <AidaMarketingHook />
+        <Hero />
+        <KeyFeatures />
+        <VideoSection />
+        <Testimonials />
+        <HowItWorks />
+        <LeadForm />
+        <FAQ />
+        <Footer />
+      </div>
 
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {
-      siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-    },
-  };
+      
+    </div>
+  );
 };
+
+export default Index;

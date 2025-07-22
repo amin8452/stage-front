@@ -34,32 +34,49 @@ const PdfViewer = ({
       // Vérification SSR - s'assurer que nous sommes côté client
       if (typeof window === 'undefined') return;
 
-      if (pdfBlob && filename) {
-        // Utilise le PDF moderne généré
+      if (downloadUrl) {
+        // Gérer les différents types d'URLs
+        if (downloadUrl.startsWith('/api/pdf/download/') || downloadUrl.startsWith('/api/admin/download/')) {
+          // Endpoint de téléchargement - ouvrir dans un nouvel onglet
+          window.open(downloadUrl, '_blank');
+        } else if (downloadUrl.startsWith('data:application/pdf;base64,')) {
+          // URL base64 - créer un lien de téléchargement direct
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = filename || `Portrait-Predictif-${Date.now()}.pdf`;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else if (pdfBlob && filename) {
+          // Utilise le PDF moderne généré (fallback)
+          // Vérifier que le blob est valide
+          if (pdfBlob.size === 0) {
+            throw new Error('Le fichier PDF est vide');
+          }
 
-        // Vérifier que le blob est valide
-        if (pdfBlob.size === 0) {
-          throw new Error('Le fichier PDF est vide');
+          const url = URL.createObjectURL(pdfBlob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          link.style.display = 'none';
+
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          // Nettoie l'URL temporaire
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 1000);
+        } else {
+          // URL normale - ouvrir dans un nouvel onglet
+          window.open(downloadUrl, '_blank');
         }
-
-        const url = URL.createObjectURL(pdfBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        link.style.display = 'none';
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        // Nettoie l'URL temporaire
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-        }, 1000);
 
         toast({
           title: "📥 Téléchargement démarré",
-          description: "Votre rapport PDF moderne avec UI professionnelle est en cours de téléchargement...",
+          description: "Votre rapport PDF professionnel est en cours de téléchargement...",
         });
       } else {
         // Fallback: génère un PDF basique avec jsPDF
@@ -79,27 +96,44 @@ const PdfViewer = ({
 
   const generateFallbackPdf = async () => {
     try {
-      const { PdfGenerator } = await import('@/services/PdfGeneratorOptimized');
-
-      const fallbackResult = await PdfGenerator.generateFallbackPdf(pdfContent, userName);
-
-      const link = document.createElement('a');
-      link.href = fallbackResult.downloadUrl;
-      link.download = fallbackResult.filename;
-      link.style.display = 'none';
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      setTimeout(() => {
-        URL.revokeObjectURL(fallbackResult.downloadUrl);
-      }, 1000);
-
-      toast({
-        title: "📥 PDF Généré !",
-        description: "Votre rapport PDF de fallback a été téléchargé.",
+      // Créer un PDF simple avec le contenu disponible
+      const response = await fetch('/api/pdf/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: userName,
+          email: 'demo@example.com',
+          sector: 'Demo',
+          position: 'Demo',
+          ambitions: 'Demo'
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la génération du PDF');
+      }
+
+      const result = await response.json();
+
+      if (result.success && result.downloadUrl) {
+        const link = document.createElement('a');
+        link.href = result.downloadUrl;
+        link.download = result.filename || 'portrait-predictif.pdf';
+        link.style.display = 'none';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast({
+          title: "📥 PDF Généré !",
+          description: "Votre rapport PDF a été téléchargé.",
+        });
+      } else {
+        throw new Error(result.error || 'Erreur de génération');
+      }
     } catch (error) {
       toast({
         title: "❌ Erreur",
