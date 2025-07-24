@@ -54,8 +54,8 @@ const VideoSection = () => {
   };
 
   return (
-    <section className="py-20 px-4 bg-black text-white">
-      <h2 className="text-3xl font-bold text-center mb-10">🎥 Démo Vidéo IA</h2>
+    <section id="video" className="py-20 px-4 bg-black text-white">
+      <h2 className="text-3xl font-bold text-center mb-10">🎥 Démo Vidéo </h2>
 
       <div className="max-w-3xl mx-auto relative rounded-xl overflow-hidden shadow-2xl">
         <div className="relative aspect-video">

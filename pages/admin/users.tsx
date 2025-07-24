@@ -6,6 +6,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  phoneNumber?: string;
   sector?: string;
   position?: string;
   ambitions?: string;
@@ -225,16 +226,17 @@ export default function AdminUsers() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {data?.users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{user.sector || 'Non spécifié'}</div>
-                      <div className="text-sm text-gray-500">{user.position || 'Non spécifié'}</div>
-                    </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                      <div className="text-sm text-gray-500">{user.email}</div>
+                      <div className="text-sm text-gray-500">{user.phoneNumber || 'Non spécifié'}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{user.sector || 'Non spécifié'}</div>
+                    <div className="text-sm text-gray-500">{user.position || 'Non spécifié'}</div>
+                  </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {user.pdfs.length} PDF{user.pdfs.length > 1 ? 's' : ''}
@@ -315,7 +317,10 @@ export default function AdminUsers() {
                   <label className="block text-sm font-medium text-gray-700">Email</label>
                   <p className="mt-1 text-sm text-gray-900">{selectedUser.email}</p>
                 </div>
-                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Numéro de téléphone</label>
+                  <p className="mt-1 text-sm text-gray-900">{selectedUser.phoneNumber || 'Non spécifié'}</p>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Secteur</label>
                   <p className="mt-1 text-sm text-gray-900">{selectedUser.sector || 'Non spécifié'}</p>

@@ -1,5 +1,23 @@
-import prisma, { CreateUserData, UserWithPdfs } from '../lib/prisma';
-import { User, Pdf } from '@prisma/client';
+import prisma from '../lib/prisma';
+import { User } from '@prisma/client';
+
+export interface CreateUserData {
+  name: string;
+  email: string;
+  phoneNumber?: string;
+  sector?: string;
+  position?: string;
+  ambitions?: string;
+}
+
+export interface UserWithPdfs extends User {
+  pdfs: {
+    id: string;
+    filename: string;
+    status: string;
+    createdAt: Date;
+  }[];
+}
 
 export class UserService {
   /**
@@ -18,6 +36,7 @@ export class UserService {
           where: { email: data.email },
           data: {
             name: data.name,
+            phoneNumber: data.phoneNumber,
             sector: data.sector,
             position: data.position,
             ambitions: data.ambitions,
@@ -31,6 +50,7 @@ export class UserService {
         data: {
           name: data.name,
           email: data.email,
+          phoneNumber: data.phoneNumber,
           sector: data.sector,
           position: data.position,
           ambitions: data.ambitions

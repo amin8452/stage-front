@@ -129,7 +129,19 @@ NEXT_PUBLIC_EMAILJS_SERVICE_ID=service_n4bnnpn
 NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=template_retcszn
 NEXT_PUBLIC_EMAILJS_TEMPLATE_PDF_ID=template_pdf_attachment
 NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=hK_d0wNIVEtyAKRYM
+
+# Admin Authentication
+NEXTAUTH_SECRET=your_jwt_secret_here
+ADMIN_USERNAME=admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your_secure_password_here
 ```
+
+Pour que l'authentification admin fonctionne correctement, vous devez définir les variables d'environnement ci-dessus dans votre environnement de développement ou de production. Assurez-vous de remplacer les valeurs par vos propres informations sécurisées.
+
+Lors du déploiement (par exemple sur Vercel), configurez ces variables d'environnement dans le tableau de bord de votre plateforme d'hébergement.
+
+Cela permettra à l'API d'authentification admin de fonctionner correctement et d'initialiser le premier compte administrateur si nécessaire.
 
 ## 📞 **Support & Contact**
 

@@ -16,6 +16,7 @@ interface EmailData {
 export interface UserInfo {
   name: string;
   email: string;
+  phoneNumber?: string;
   sector?: string;
   position?: string;
   ambitions?: string;
@@ -438,25 +439,26 @@ ${companyConfig.tagline}`;
 
     return `🔔 NOUVELLE UTILISATION DU SERVICE PORTRAIT IA
 
-📅 Date et heure : ${timestamp}
+    📅 Date et heure : ${timestamp}
 
-👤 INFORMATIONS CLIENT :
-• Nom complet : ${name}
-• Email professionnel : ${email}
-• Secteur d'activité : ${userInfo?.sector || 'Non renseigné'}
-• Poste actuel : ${userInfo?.position || 'Non renseigné'}
+    👤 INFORMATIONS CLIENT :
+    • Nom complet : ${name}
+    • Email professionnel : ${email}
+    • Numéro de téléphone : ${userInfo?.phoneNumber || 'Non renseigné'}
+    • Secteur d'activité : ${userInfo?.sector || 'Non renseigné'}
+    • Poste actuel : ${userInfo?.position || 'Non renseigné'}
 
-💼 VISION STRATÉGIQUE :
-• Ambitions à 3 ans : ${userInfo?.ambitions || 'Non renseignées'}
+    💼 VISION STRATÉGIQUE :
+    • Ambitions à 3 ans : ${userInfo?.ambitions || 'Non renseignées'}
 
-📊 STATUT :
-• Portrait IA généré avec succès
-• Email de confirmation envoyé au client
-• PDF disponible pour téléchargement
+    📊 STATUT :
+    • Portrait IA généré avec succès
+    • Email de confirmation envoyé au client
+    • PDF disponible pour téléchargement
 
----
-Notification automatique du système MS360
-Pour toute question, contactez l'équipe technique.`;
+    ---
+    Notification automatique du système MS360
+    Pour toute question, contactez l'équipe technique.`;
   }
 
 

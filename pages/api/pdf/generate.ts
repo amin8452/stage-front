@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { UserService } from '../../../src/services/UserService';
+import { UserService, CreateUserData } from '../../../src/services/UserService';
 import { PdfService } from '../../../src/services/PdfService';
 
 interface FormData {
   name: string;
   email: string;
+  phoneNumber?: string;
   sector: string;
   position: string;
   ambitions: string;
@@ -20,6 +21,8 @@ interface ApiResponse {
   pdfUrl?: string;
   downloadUrl?: string;
   filename?: string;
+  pdfId?: string;
+  userId?: string;
   message?: string;
   error?: string;
 }
@@ -73,13 +76,16 @@ export default async function handler(
 
   try {
     // 1. Créer ou mettre à jour l'utilisateur dans la base de données
-    const user = await UserService.createUser({
+    const userData: CreateUserData = {
       name: formData.name,
       email: formData.email,
+      phoneNumber: formData.phoneNumber,
       sector: formData.sector,
       position: formData.position,
       ambitions: formData.ambitions
-    });
+    };
+
+    const user = await UserService.createUser(userData);
 
     // 2. Import dynamique pour éviter les problèmes SSR
     const { PDFKitGenerator } = await import('../../../src/services/PDFKitGenerator');
@@ -152,13 +158,15 @@ export default async function handler(
 
     // En cas d'erreur, essayer quand même de sauvegarder l'utilisateur
     try {
-      await UserService.createUser({
+      const userData: CreateUserData = {
         name: formData.name,
         email: formData.email,
+        phoneNumber: formData.phoneNumber,
         sector: formData.sector,
         position: formData.position,
         ambitions: formData.ambitions
-      });
+      };
+      await UserService.createUser(userData);
     } catch (userError) {
       // Erreur silencieuse pour la sauvegarde utilisateur
     }
@@ -179,5 +187,5 @@ export const config = {
     },
     responseLimit: '10mb',
   },
-  maxDuration: 45, // 45 secondes max pour la génération PDF
+  maxDuration: 120, // 45 secondes max pour la génération PDF
 };

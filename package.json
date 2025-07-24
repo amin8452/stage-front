@@ -14,7 +14,11 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "admin:init": "node scripts/init-admin.js",
-    "security-check": "echo Checking for exposed sensitive files... && dir /ah .env* 2>nul || echo No hidden .env files found"
+    "security-check": "echo Checking for exposed sensitive files... && dir /ah .env* 2>nul || echo No hidden .env files found",
+    "deploy:admin": "powershell -ExecutionPolicy Bypass -File deploy-admin.ps1",
+    "deploy:user": "powershell -ExecutionPolicy Bypass -File deploy-user.ps1",
+    "deploy:admin:bash": "bash deploy-admin.sh",
+    "deploy:user:bash": "bash deploy-user.sh"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

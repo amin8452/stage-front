@@ -67,6 +67,8 @@ export interface PdfWithUser {
   filename: string;
   originalName?: string;
   fileSize?: number;
+  content?: string;
+  downloadUrl?: string;
   status: string;
   createdAt: Date;
   user: {

@@ -20,13 +20,23 @@ const LeadForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phoneNumber: "",
     sector: "",
     position: "",
     ambitions: ""
   });
-  const [userInfo, setUserInfo] = useState({
+  interface UserInfoState {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    sector: string;
+    position: string;
+  }
+
+  const [userInfo, setUserInfo] = useState<UserInfoState>({
     name: "",
     email: "",
+    phoneNumber: "",
     sector: "",
     position: ""
   });
@@ -103,6 +113,7 @@ const LeadForm = () => {
         setUserInfo({
           name: formData.name,
           email: formData.email,
+          phoneNumber: formData.phoneNumber,
           sector: formData.sector,
           position: formData.position
         });
@@ -112,6 +123,7 @@ const LeadForm = () => {
           const userInfo: UserInfo = {
             name: formData.name,
             email: formData.email,
+            phoneNumber: formData.phoneNumber,
             sector: formData.sector,
             position: formData.position,
             ambitions: formData.ambitions,
@@ -151,6 +163,7 @@ const LeadForm = () => {
         setFormData({
           name: "",
           email: "",
+          phoneNumber: "",
           sector: "",
           position: "",
           ambitions: ""
@@ -389,18 +402,30 @@ const LeadForm = () => {
                     />
                   </div>
 
-                  <div className="space-y-3">
-                    <Label htmlFor="email" className="text-lg font-semibold text-white">Email professionnel *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      placeholder="jean.dupont@entreprise.com"
-                      required
-                      className="h-14 text-lg bg-white/5 backdrop-blur-sm border border-white/20 text-white placeholder-slate-400 focus:border-cyan-400 focus:bg-white/10 rounded-xl transition-all duration-300"
-                    />
-                  </div>
+                <div className="space-y-3">
+                  <Label htmlFor="email" className="text-lg font-semibold text-white">Email professionnel *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    placeholder="jean.dupont@entreprise.com"
+                    required
+                    className="h-14 text-lg bg-white/5 backdrop-blur-sm border border-white/20 text-white placeholder-slate-400 focus:border-cyan-400 focus:bg-white/10 rounded-xl transition-all duration-300"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="phoneNumber" className="text-lg font-semibold text-white">Numéro de téléphone *</Label>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    value={formData.phoneNumber}
+                    onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                    placeholder="+33 6 12 34 56 78"
+                    required
+                    className="h-14 text-lg bg-white/5 backdrop-blur-sm border border-white/20 text-white placeholder-slate-400 focus:border-cyan-400 focus:bg-white/10 rounded-xl transition-all duration-300"
+                  />
+                </div>
                 </div>
 
                 <div className="flex justify-end">
