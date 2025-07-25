@@ -48,32 +48,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse>
 ) {
-  // Log pour debug
-  console.log('🔍 PDF API - Method:', req.method);
-  console.log('🔍 PDF API - Headers:', req.headers);
-  console.log('🔍 PDF API - Body type:', typeof req.body);
-
-  // Gestion CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  // Gestion des requêtes OPTIONS (preflight)
-  if (req.method === 'OPTIONS') {
-    console.log('✅ PDF API - OPTIONS request handled');
-    return res.status(200).end();
-  }
-
   // Vérification de la méthode HTTP
   if (req.method !== 'POST') {
-    console.log('❌ PDF API - Method not allowed:', req.method);
     return res.status(405).json({
       success: false,
-      error: `Méthode ${req.method} non autorisée. POST requis.`
+      error: 'Méthode non autorisée'
     });
   }
-
-  console.log('✅ PDF API - POST method confirmed');
 
   // API publique - pas de validation de clé requise pour l'accès public
   // if (!validateInternalApiKey(req)) {
@@ -84,15 +65,12 @@ export default async function handler(
   // }
 
   // Validation des données
-  console.log('🔍 PDF API - Validating request body...');
   if (!validateRequest(req.body)) {
-    console.log('❌ PDF API - Validation failed:', req.body);
     return res.status(400).json({
       success: false,
       error: 'Données invalides'
     });
   }
-  console.log('✅ PDF API - Validation passed');
 
   const { formData, aiContent }: PdfGenerationRequest = req.body;
 

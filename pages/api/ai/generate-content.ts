@@ -48,16 +48,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse>
 ) {
-  // Gestion CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  // Gestion des requêtes OPTIONS (preflight)
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
   // Vérification de la méthode HTTP
   if (req.method !== 'POST') {
     return res.status(405).json({
