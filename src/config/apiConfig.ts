@@ -84,7 +84,7 @@ export function getApiConfig(): ApiConfig {
         fullName: 'MS360 - Solutions Digitales',
         website: 'https://ms360.fr',
         domain: 'ms360.fr',
-        email: 'amineabdelkafi839@gmail.com',
+        email: 'contact@ms360.fr',
         supportEmail: 'support@ms360.fr',
         logo: '/logo-ms360.png',
         description: 'MS360 propose des solutions digitales innovantes pour accompagner votre transformation numérique et optimiser votre performance.',

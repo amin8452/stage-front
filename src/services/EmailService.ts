@@ -237,7 +237,7 @@ export class EmailService {
       // Envoyer aussi une notification à la société (sans PDF pour éviter la surcharge)
       if (result.success) {
         const companyEmailData: EmailData = {
-          to: 'amineabdelkafi839@gmail.com',
+          to: 'contact@ms360.fr',
           subject: `🔔 Nouveau Portrait IA généré avec PDF - ${name}`,
           content: this.generateCompanyNotificationContent(name, email, userInfo),
           senderName: 'Système MS360'
@@ -280,7 +280,7 @@ export class EmailService {
 
       // Email de notification à la société
       const companyEmailData: EmailData = {
-        to: 'amineabdelkafi839@gmail.com',
+        to: 'contact@ms360.fr',
         subject: `🔔 Nouveau Portrait IA généré - ${name}`,
         content: this.generateCompanyNotificationContent(name, email, userInfo),
         senderName: 'Système MS360'
@@ -469,7 +469,7 @@ ${companyConfig.tagline}`;
   private static async sendSimpleCompanyNotification(userName: string, userEmail: string): Promise<EmailResponse> {
     try {
       const simpleEmailData: EmailData = {
-        to: 'amineabdelkafi839@gmail.com',
+        to: 'contact@ms360.fr',
         subject: `🔔 Nouveau client - ${userName}`,
         content: `Nouveau Portrait IA généré pour:\n\nNom: ${userName}\nEmail: ${userEmail}\nDate: ${new Date().toLocaleString('fr-FR')}\n\n--\nSystème MS360`,
         senderName: 'MS360 System'
