@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
+    "vercel-build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "hide-sensitive": "powershell -ExecutionPolicy Bypass -File Hide-SensitiveFiles.ps1",
     "show-sensitive": "powershell -ExecutionPolicy Bypass -File Show-SensitiveFiles.ps1",
     "db:generate": "prisma generate",
