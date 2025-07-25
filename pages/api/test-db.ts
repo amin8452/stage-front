@@ -32,16 +32,17 @@ export default async function handler(
     // Tenter d'importer Prisma
     let dbStatus = 'Non testée';
     try {
-      const { prisma } = await import('../../src/lib/prisma');
-      
+      const prismaModule = await import('../../src/lib/prisma');
+      const prisma = prismaModule.default;
+
       // Test simple de connexion
       await prisma.$connect();
       dbStatus = 'Connexion réussie';
-      
+
       // Test de requête simple
       const userCount = await prisma.user.count();
       dbStatus = `Connexion OK - ${userCount} utilisateurs`;
-      
+
       await prisma.$disconnect();
     } catch (dbError) {
       dbStatus = `Erreur DB: ${dbError instanceof Error ? dbError.message : 'Erreur inconnue'}`;
